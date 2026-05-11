@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "american-default-research": {
+      "transport": "streamableHttp",
+      "url": "https://mcp.americandefault.org/mcp"
+    }
+  }
+}
