@@ -47,8 +47,12 @@ for _noisy in ("httpx", "anyio", "mcp.server.lowlevel.server"):
     logging.getLogger(_noisy).setLevel(logging.WARNING)
 
 
+from typing import Annotated  # noqa: E402
+
 from mcp.server.fastmcp import Context, FastMCP  # noqa: E402
 from mcp.server.transport_security import TransportSecuritySettings  # noqa: E402
+from mcp.types import ToolAnnotations  # noqa: E402
+from pydantic import Field  # noqa: E402
 
 from scripts.machine_layer.auth import log_auth_attempt  # noqa: E402
 from scripts.machine_layer.rate_limit import check_and_consume  # noqa: E402
@@ -143,8 +147,29 @@ def _gate(ctx: Context | None, tool_name: str) -> None:
         "for the full data. Slug examples: 'the-buffer' (personal savings "
         "rate), 'mortgage-delinquency', 'initial-unemployment-claims-sa'."
     ),
+    annotations=ToolAnnotations(
+        title="Get indicator",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=False,
+    ),
 )
-def _get_indicator(slug: str, ctx: Context | None = None) -> dict:
+def _get_indicator(
+    slug: Annotated[
+        str,
+        Field(
+            description=(
+                "The kebab-case indicator slug (e.g., 'the-buffer' for personal "
+                "savings rate, 'mortgage-delinquency', 'initial-unemployment-claims-sa'). "
+                "96 indicators available. Use `search_indicators` first to discover "
+                "which slug corresponds to a concept."
+            ),
+        ),
+    ],
+    ctx: Context | None = None,
+) -> dict:
+    """Fetch a compact snapshot of an American Default indicator by slug."""
     _gate(ctx, "get_indicator")
     return get_indicator.run(slug)
 
@@ -161,8 +186,28 @@ def _get_indicator(slug: str, ctx: Context | None = None) -> dict:
         "citations. Accepts 4-digit FIPS with implicit leading zero. "
         "3,144 counties available."
     ),
+    annotations=ToolAnnotations(
+        title="Get county scorecard",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=False,
+    ),
 )
-def _get_county_scorecard(fips: str, ctx: Context | None = None) -> dict:
+def _get_county_scorecard(
+    fips: Annotated[
+        str,
+        Field(
+            description=(
+                "The 5-digit numeric county FIPS code as a string (e.g., '13063' "
+                "for Clayton County, GA). 4-digit values are zero-padded internally. "
+                "3,144 counties available."
+            ),
+        ),
+    ],
+    ctx: Context | None = None,
+) -> dict:
+    """Fetch a county's County Distress Index (CDI) scorecard."""
     _gate(ctx, "get_county_scorecard")
     return get_county_scorecard.run(fips)
 
@@ -176,8 +221,20 @@ def _get_county_scorecard(fips: str, ctx: Context | None = None) -> dict:
         "Financial Conditions, Cost Pressure, Labor) with Z-scores and "
         "point contributions. Updated quarterly."
     ),
+    annotations=ToolAnnotations(
+        title="Get ADI composite",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=False,
+    ),
 )
 def _get_adi_composite(ctx: Context | None = None) -> dict:
+    """Fetch the latest American Distress Index (ADI) composite reading.
+
+    No parameters. Returns the most recent quarter's composite score, zone,
+    and 5-component breakdown.
+    """
     _gate(ctx, "get_adi_composite")
     return get_adi_composite.run()
 
@@ -194,12 +251,38 @@ def _get_adi_composite(ctx: Context | None = None) -> dict:
         "when you want to discover which slug corresponds to a concept "
         "before calling `get_indicator`."
     ),
+    annotations=ToolAnnotations(
+        title="Search indicators",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=False,
+    ),
 )
 def _search_indicators(
-    query: str,
-    limit: int = 10,
+    query: Annotated[
+        str,
+        Field(
+            description=(
+                "The keyword to search (e.g., 'savings', 'mortgage', 'inflation'). "
+                "Scoring runs substring + prefix matching over slug, branded_name, "
+                "name, and category fields."
+            ),
+        ),
+    ],
+    limit: Annotated[
+        int,
+        Field(
+            default=10,
+            description=(
+                "Max number of ranked matches to return. Default 10. Hard cap 50 "
+                "(values above are clamped). Values above 1000 are rejected as abuse."
+            ),
+        ),
+    ] = 10,
     ctx: Context | None = None,
 ) -> dict:
+    """Search the 96-indicator registry by keyword."""
     _gate(ctx, "search_indicators")
     return search_indicators.run(query, limit=limit)
 
@@ -218,8 +301,29 @@ def _search_indicators(
         "indicators return empty lists; currently six pairs clear the "
         "full gauntlet."
     ),
+    annotations=ToolAnnotations(
+        title="Get cross-correlations",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=False,
+    ),
 )
-def _get_cross_correlations(slug: str, ctx: Context | None = None) -> dict:
+def _get_cross_correlations(
+    slug: Annotated[
+        str,
+        Field(
+            description=(
+                "The kebab-case indicator slug to look up (e.g., 'the-buffer', "
+                "'initial-unemployment-claims-sa'). Returns split lists of pairs "
+                "where this indicator is the leader vs the follower. Empty lists "
+                "are common — only fully-validated pairs surface."
+            ),
+        ),
+    ],
+    ctx: Context | None = None,
+) -> dict:
+    """Fetch validated leading/lagging indicator relationships."""
     _gate(ctx, "get_cross_correlations")
     return get_cross_correlations.run(slug)
 
