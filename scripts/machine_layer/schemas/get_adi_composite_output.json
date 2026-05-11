@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "american-default-mcp/v1/get_adi_composite_output.json",
+  "title": "get_adi_composite output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "quarter",
+    "date",
+    "composite_score",
+    "composite_z",
+    "zone",
+    "components",
+    "methodology_url",
+    "url",
+    "citation",
+    "as_of_date",
+    "freshness_warning"
+  ],
+  "properties": {
+    "schema_version": {"const": "v1"},
+    "quarter": {"type": "string", "pattern": "^[0-9]{4}-Q[1-4]$"},
+    "date": {"type": "string"},
+    "composite_score": {"type": "number", "minimum": 0, "maximum": 100},
+    "composite_z": {"type": "number"},
+    "zone": {"enum": ["Healthy", "Normal", "Elevated", "Serious", "Crisis"]},
+    "components": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "buffer_z",
+        "debt_stress_z",
+        "financial_conditions_z",
+        "cost_pressure_z",
+        "labor_z",
+        "buffer_contribution",
+        "debt_stress_contribution",
+        "financial_conditions_contribution",
+        "cost_pressure_contribution",
+        "labor_contribution"
+      ],
+      "properties": {
+        "buffer_z": {"type": "number"},
+        "debt_stress_z": {"type": "number"},
+        "financial_conditions_z": {"type": "number"},
+        "cost_pressure_z": {"type": "number"},
+        "labor_z": {"type": "number"},
+        "buffer_contribution": {"type": "number"},
+        "debt_stress_contribution": {"type": "number"},
+        "financial_conditions_contribution": {"type": "number"},
+        "cost_pressure_contribution": {"type": "number"},
+        "labor_contribution": {"type": "number"}
+      }
+    },
+    "methodology_url": {"type": "string"},
+    "url": {"type": "string"},
+    "citation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["newscopy", "apa", "mla", "chicago", "source_attribution"],
+      "properties": {
+        "newscopy": {"type": "string"},
+        "apa": {"type": "string"},
+        "mla": {"type": "string"},
+        "chicago": {"type": "string"},
+        "source_attribution": {"type": "string"}
+      }
+    },
+    "as_of_date": {"type": ["string", "null"]},
+    "freshness_warning": {"type": "boolean"}
+  }
+}

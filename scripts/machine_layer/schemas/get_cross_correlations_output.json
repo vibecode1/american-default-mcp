@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "american-default-mcp/v1/get_cross_correlations_output.json",
+  "title": "get_cross_correlations output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "indicator_slug",
+    "as_leader",
+    "as_follower",
+    "as_of_date",
+    "freshness_warning"
+  ],
+  "properties": {
+    "schema_version": {"const": "v1"},
+    "indicator_slug": {"type": "string"},
+    "as_leader": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/pair"}
+    },
+    "as_follower": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/pair"}
+    },
+    "as_of_date": {"type": ["string", "null"]},
+    "freshness_warning": {"type": "boolean"}
+  },
+  "$defs": {
+    "pair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "leader_slug",
+        "leader_name",
+        "follower_slug",
+        "follower_name",
+        "lag_quarters",
+        "correlation_r",
+        "crises_validated",
+        "granger_p",
+        "oos_validation_r"
+      ],
+      "properties": {
+        "leader_slug": {"type": "string"},
+        "leader_name": {"type": "string"},
+        "follower_slug": {"type": "string"},
+        "follower_name": {"type": "string"},
+        "lag_quarters": {"type": "integer"},
+        "correlation_r": {"type": "number"},
+        "crises_validated": {"type": "integer", "minimum": 0},
+        "granger_p": {"type": "number"},
+        "oos_validation_r": {"type": "number"}
+      }
+    }
+  }
+}

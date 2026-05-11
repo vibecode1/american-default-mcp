@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "american-default-mcp/v1/get_county_scorecard_input.json",
+  "title": "get_county_scorecard input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fips"],
+  "properties": {
+    "fips": {
+      "type": "string",
+      "description": "4- or 5-digit numeric county FIPS code. 4-digit values are zero-padded internally.",
+      "minLength": 4,
+      "maxLength": 5,
+      "pattern": "^[0-9]{4,5}$"
+    }
+  }
+}

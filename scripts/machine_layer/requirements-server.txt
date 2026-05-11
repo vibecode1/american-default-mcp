@@ -1,0 +1,7 @@
+# Runtime deps for the MCP HTTP server only — kept lean so the Cloud
+# Run image stays small (~150MB vs ~700MB from full requirements.txt).
+mcp>=1.27.0,<1.28.0
+uvicorn>=0.30
+starlette>=0.40
+jsonschema>=4.0
+python-multipart>=0.0.9

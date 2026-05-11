@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "american-default-mcp/v1/get_adi_composite_input.json",
+  "title": "get_adi_composite input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {}
+}

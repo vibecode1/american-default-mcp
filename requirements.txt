@@ -1,0 +1,7 @@
+# Runtime deps for the MCP HTTP server. Kept lean so the production
+# container stays small (~150MB).
+mcp>=1.27.0,<1.28.0
+uvicorn>=0.30
+starlette>=0.40
+jsonschema>=4.0
+python-multipart>=0.0.9

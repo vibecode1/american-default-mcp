@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "american-default-mcp/v1/get_county_scorecard_output.json",
+  "title": "get_county_scorecard output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "fips",
+    "county_name",
+    "state_name",
+    "state_abbr",
+    "composite_score",
+    "zone",
+    "zone_color",
+    "national_rank",
+    "national_rank_ordinal",
+    "state_rank",
+    "domain_breakdown",
+    "key_findings",
+    "url",
+    "citation",
+    "as_of_date",
+    "freshness_warning"
+  ],
+  "properties": {
+    "schema_version": {"const": "v1"},
+    "fips": {"type": "string", "pattern": "^[0-9]{5}$"},
+    "county_name": {"type": "string"},
+    "state_name": {"type": "string"},
+    "state_abbr": {"type": "string", "minLength": 2, "maxLength": 2},
+    "composite_score": {"type": "number", "minimum": 0, "maximum": 100},
+    "zone": {"enum": ["Healthy", "Normal", "Elevated", "Serious", "Crisis"]},
+    "zone_color": {"type": "string"},
+    "national_rank": {"type": "integer", "minimum": 1, "maximum": 3144},
+    "national_rank_ordinal": {"type": "string"},
+    "state_rank": {"type": "integer", "minimum": 1},
+    "population": {"type": ["integer", "null"]},
+    "domain_breakdown": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "score", "weight_pct", "primary_driver"],
+        "properties": {
+          "name": {"type": "string"},
+          "score": {"type": "number", "minimum": 0, "maximum": 100},
+          "weight_pct": {"type": "number", "minimum": 0, "maximum": 100},
+          "rank": {"type": ["integer", "null"]},
+          "percentile": {"type": ["number", "null"]},
+          "primary_driver": {"type": "boolean"}
+        }
+      }
+    },
+    "key_findings": {"type": "array", "items": {"type": "string"}},
+    "url": {"type": "string"},
+    "citation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["newscopy", "apa", "mla", "chicago", "source_attribution"],
+      "properties": {
+        "newscopy": {"type": "string"},
+        "apa": {"type": "string"},
+        "mla": {"type": "string"},
+        "chicago": {"type": "string"},
+        "source_attribution": {"type": "string"}
+      }
+    },
+    "as_of_date": {"type": ["string", "null"]},
+    "freshness_warning": {"type": "boolean"}
+  }
+}

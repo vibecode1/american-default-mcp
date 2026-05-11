@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "american-default-mcp/v1/search_indicators_output.json",
+  "title": "search_indicators output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "query",
+    "count",
+    "results",
+    "as_of_date",
+    "freshness_warning"
+  ],
+  "properties": {
+    "schema_version": {"const": "v1"},
+    "query": {"type": "string"},
+    "count": {"type": "integer", "minimum": 0},
+    "results": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["slug", "branded_name", "name", "category", "url"],
+        "properties": {
+          "slug": {"type": "string"},
+          "branded_name": {"type": "string"},
+          "name": {"type": "string"},
+          "category": {"type": ["string", "null"]},
+          "url": {"type": "string", "format": "uri"}
+        }
+      }
+    },
+    "as_of_date": {"type": ["string", "null"]},
+    "freshness_warning": {"type": "boolean"}
+  }
+}
