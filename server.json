@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "org.americandefault/research",
   "title": "American Default Research",
-  "description": "Read-only MCP for U.S. household distress: 96 indicators, ADI composite, 3,144 counties.",
+  "description": "Read-only research tools for U.S. household financial distress, economic indicators, county scorecards, ADI and citations.",
   "version": "1.0.1",
   "websiteUrl": "https://americandefault.org/press/mcp/",
   "repository": {
