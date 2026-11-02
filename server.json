@@ -1,14 +1,14 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "org.americandefault/research",
+  "description": "Read-only U.S. household-finance research: economic indicators, county scores, ADI and citations.",
   "title": "American Default Research",
-  "description": "Read-only research tools for U.S. household financial distress, economic indicators, county scorecards, ADI and citations.",
-  "version": "1.0.1",
-  "websiteUrl": "https://americandefault.org/press/mcp/",
   "repository": {
     "url": "https://github.com/vibecode1/american-default-mcp",
     "source": "github"
   },
+  "version": "1.1.1",
+  "websiteUrl": "https://americandefault.org/press/mcp/",
   "remotes": [
     {
       "type": "streamable-http",
