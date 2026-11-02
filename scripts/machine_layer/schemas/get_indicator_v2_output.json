@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "american-default-mcp/v2/get_indicator_v2_output.json",
+  "title": "get_indicator_v2 output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "slug",
+    "branded_name",
+    "name",
+    "unit",
+    "frequency",
+    "direction",
+    "trend_suppressed",
+    "source",
+    "source_url",
+    "url",
+    "series_breaks",
+    "citation",
+    "as_of_date",
+    "freshness_warning"
+  ],
+  "properties": {
+    "schema_version": {"const": "v2"},
+    "status": {"enum": ["ok", "awaiting_population"]},
+    "slug": {"type": "string", "minLength": 1},
+    "branded_name": {"type": "string"},
+    "name": {"type": "string"},
+    "unit": {"type": "string"},
+    "frequency": {"type": "string"},
+    "direction": {"type": "string"},
+    "trend_suppressed": {"type": ["string", "null"]},
+    "category": {"type": ["string", "null"]},
+    "latest_value": {"type": ["number", "null"]},
+    "latest_period": {"type": ["string", "null"]},
+    "source": {"type": "string"},
+    "source_url": {"type": "string"},
+    "url": {"type": "string", "format": "uri"},
+    "aggregates": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["period_averages", "extremes", "sustained_runs"],
+      "properties": {
+        "period_averages": {"type": "object"},
+        "extremes": {"type": "object"},
+        "sustained_runs": {"type": "array"}
+      }
+    },
+    "prose": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["headline", "card_context", "card_verdict"],
+      "properties": {
+        "headline": {"type": ["string", "null"]},
+        "card_context": {"type": ["string", "null"]},
+        "card_verdict": {"type": ["string", "null"]}
+      }
+    },
+    "citation": {"$ref": "#/$defs/citation"},
+    "as_of_date": {"type": ["string", "null"]},
+    "freshness_warning": {"type": "boolean"},
+    "series_breaks": {
+      "description": "Comparability boundaries inside the series. When non-empty, aggregates cover the current measurement basis only and must not be read across one of these dates.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["date", "reason"],
+        "properties": {
+          "date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+          "reason": {"type": "string", "minLength": 1},
+          "source_url": {"type": "string"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "citation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["newscopy", "apa", "mla", "chicago", "source_attribution"],
+      "properties": {
+        "newscopy": {"type": "string"},
+        "apa": {"type": "string"},
+        "mla": {"type": "string"},
+        "chicago": {"type": "string"},
+        "source_attribution": {"type": "string"}
+      }
+    }
+  }
+}

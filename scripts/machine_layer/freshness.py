@@ -22,6 +22,7 @@ inject a frozen `today` for determinism.
 from __future__ import annotations
 
 import logging
+from calendar import monthrange
 from datetime import date, datetime, timezone
 from typing import Optional
 
@@ -49,6 +50,13 @@ STALE_THRESHOLDS: dict[str, int] = {
     "semi_annual": 240,
     "annual": 545,
     "biennial": 800,
+    # Event-driven cadence (METR autonomous-task-horizon, release-anchored
+    # sources). The freshness gate accepts gaps up to ~1y as normal — see
+    # scripts/indicators/freshness.py STALENESS_THRESHOLDS["as_published"]
+    # for the calendar-side rationale. The MCP server uses this looser
+    # threshold (~500d) so a normal release cadence doesn't carry a
+    # stale-warning flag.
+    "as_published": 500,
 }
 
 # Cadences that are present in registry data but for which staleness
@@ -93,6 +101,7 @@ def compute_freshness(
     frequency: Optional[str],
     *,
     today: Optional[date] = None,
+    observation_frequency: Optional[str] = None,
 ) -> tuple[Optional[str], bool]:
     """Return (as_of_date_iso_or_None, freshness_warning_bool).
 
@@ -125,7 +134,14 @@ def compute_freshness(
         return iso_str, False
 
     base_today = today or _today()
-    age_days = (base_today - parsed).days
+    # Monthly observations are conventionally dated on the month's first day,
+    # but describe the whole month. Starting the clock there declared the latest
+    # September release stale on November 1. Keep the published observation date
+    # intact and measure its age from the end of its reporting month instead.
+    reference = parsed
+    if (observation_frequency or freq_norm).lower() == "monthly":
+        reference = parsed.replace(day=monthrange(parsed.year, parsed.month)[1])
+    age_days = (base_today - reference).days
     return iso_str, age_days > threshold
 
 

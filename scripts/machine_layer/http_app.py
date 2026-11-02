@@ -1,6 +1,6 @@
 """HTTP transport for the American Default MCP server.
 
-Wraps ``FastMCP.streamable_http_app()`` (a Starlette ASGI app) with two
+Wraps ``MCPServer.streamable_http_app()`` (a Starlette ASGI app) with two
 ASGI middlewares plus extra non-MCP routes:
 
 1. **Bearer-auth middleware (tier model).** No bearer header = anonymous
@@ -426,8 +426,14 @@ async def _contact_post(request: Request) -> Response:
 def build_app(mcp_app=None) -> Starlette:
     """Construct the Starlette app for the MCP HTTP transport."""
     if mcp_app is None:
-        from scripts.machine_layer.mcp_server import mcp as _mcp
-        mcp_app = _mcp.streamable_http_app()
+        from scripts.machine_layer.mcp_server import (
+            _build_transport_security,
+            mcp as _mcp,
+        )
+
+        mcp_app = _mcp.streamable_http_app(
+            transport_security=_build_transport_security()
+        )
 
     routes: list = list(mcp_app.routes)
     routes.append(Route(HEALTH_PATH, endpoint=_healthz, methods=["GET"]))

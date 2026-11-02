@@ -7,11 +7,13 @@
   "required": [
     "schema_version",
     "quarter",
-    "date",
-    "composite_score",
-    "composite_z",
-    "zone",
-    "components",
+    "composite",
+    "band",
+    "band_label",
+    "reading",
+    "rank_in_history",
+    "domains",
+    "members",
     "methodology_url",
     "url",
     "citation",
@@ -19,55 +21,154 @@
     "freshness_warning"
   ],
   "properties": {
-    "schema_version": {"const": "v1"},
-    "quarter": {"type": "string", "pattern": "^[0-9]{4}-Q[1-4]$"},
-    "date": {"type": "string"},
-    "composite_score": {"type": "number", "minimum": 0, "maximum": 100},
-    "composite_z": {"type": "number"},
-    "zone": {"enum": ["Healthy", "Normal", "Elevated", "Serious", "Crisis"]},
-    "components": {
+    "schema_version": {
+      "const": "v1"
+    },
+    "quarter": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-Q[1-4]$"
+    },
+    "composite": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "band": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "band_label": {
+      "enum": [
+        "Minimal",
+        "Low",
+        "Typical",
+        "High",
+        "Severe"
+      ]
+    },
+    "reading": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rank_in_history": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "buffer_z",
-        "debt_stress_z",
-        "financial_conditions_z",
-        "cost_pressure_z",
-        "labor_z",
-        "buffer_contribution",
-        "debt_stress_contribution",
-        "financial_conditions_contribution",
-        "cost_pressure_contribution",
-        "labor_contribution"
+        "percent_of_quarters_below",
+        "reading"
       ],
       "properties": {
-        "buffer_z": {"type": "number"},
-        "debt_stress_z": {"type": "number"},
-        "financial_conditions_z": {"type": "number"},
-        "cost_pressure_z": {"type": "number"},
-        "labor_z": {"type": "number"},
-        "buffer_contribution": {"type": "number"},
-        "debt_stress_contribution": {"type": "number"},
-        "financial_conditions_contribution": {"type": "number"},
-        "cost_pressure_contribution": {"type": "number"},
-        "labor_contribution": {"type": "number"}
+        "percent_of_quarters_below": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "reading": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
-    "methodology_url": {"type": "string"},
-    "url": {"type": "string"},
+    "domains": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "delinquency",
+        "default_legal",
+        "debt_burden",
+        "labor",
+        "safety_net_buffer"
+      ],
+      "properties": {
+        "delinquency": {
+          "$ref": "#/$defs/domainScore"
+        },
+        "default_legal": {
+          "$ref": "#/$defs/domainScore"
+        },
+        "debt_burden": {
+          "$ref": "#/$defs/domainScore"
+        },
+        "labor": {
+          "$ref": "#/$defs/domainScore"
+        },
+        "safety_net_buffer": {
+          "$ref": "#/$defs/domainScore"
+        }
+      }
+    },
+    "members": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "methodology_url": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    },
     "citation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["newscopy", "apa", "mla", "chicago", "source_attribution"],
+      "required": [
+        "newscopy",
+        "apa",
+        "mla",
+        "chicago",
+        "source_attribution"
+      ],
       "properties": {
-        "newscopy": {"type": "string"},
-        "apa": {"type": "string"},
-        "mla": {"type": "string"},
-        "chicago": {"type": "string"},
-        "source_attribution": {"type": "string"}
+        "newscopy": {
+          "type": "string"
+        },
+        "apa": {
+          "type": "string"
+        },
+        "mla": {
+          "type": "string"
+        },
+        "chicago": {
+          "type": "string"
+        },
+        "source_attribution": {
+          "type": "string"
+        }
       }
     },
-    "as_of_date": {"type": ["string", "null"]},
-    "freshness_warning": {"type": "boolean"}
+    "as_of_date": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "freshness_warning": {
+      "type": "boolean"
+    }
+  },
+  "$defs": {
+    "domainScore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "score",
+        "members_present"
+      ],
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "members_present": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
   }
 }

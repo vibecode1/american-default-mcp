@@ -3,9 +3,9 @@
 Reads `data/research/leading_indicators.json` — produced by the five-filter
 leading-indicator scanner (cross-correlation → first-differenced CCF →
 multi-crisis validation → Granger causality → out-of-sample validation).
-Only the `summary.fully_validated` list is exposed: those six (currently)
-pairs have passed all five filters, including Granger p < 0.05 and OOS
-r > 0.3. Partial matches are not returned — clients that want the raw
+Only the `summary.fully_validated` list is exposed: every returned pair has
+passed all five filters, including Granger p < 0.05 and OOS r > 0.3. Partial
+matches are not returned — clients that want the raw
 universe can hit
 `https://americandefault.org/api/research/leading-indicators.json` for
 every scored pair.
@@ -15,7 +15,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from mcp.server.fastmcp.exceptions import ToolError
+from mcp.server.mcpserver.exceptions import ToolError
 
 from scripts.machine_layer.data_loaders import (
     load_indicator_registry,
@@ -83,8 +83,8 @@ def run(slug: str) -> dict:
     ToolError("slug_not_found") when the slug is not in the registry.
     An indicator that is in the registry but does not appear in any
     fully-validated pair returns two empty lists — this is the normal
-    case for most of the 96 indicators (only six pairs currently
-    clear the full five-filter gauntlet).
+    case for most indicators because only a small subset clears the full
+    five-filter gauntlet.
     """
     if not isinstance(slug, str) or not slug:
         raise ToolError("invalid_input: slug must be a non-empty string")

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "american-default-mcp/v2/get_indicator_v2_input.json",
+  "title": "get_indicator_v2 input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slug", "response_version"],
+  "properties": {
+    "slug": {
+      "type": "string",
+      "description": "Kebab-case indicator slug (e.g. 'the-buffer').",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$"
+    },
+    "response_version": {
+      "const": "v2",
+      "description": "Explicit opt-in to the get_indicator v2 response contract."
+    }
+  }
+}

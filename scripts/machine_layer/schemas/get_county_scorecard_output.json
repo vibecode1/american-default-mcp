@@ -11,6 +11,10 @@
     "state_name",
     "state_abbr",
     "composite_score",
+    "score_gloss",
+    "score_gloss_color",
+    "distress_fifth",
+    "distress_fifth_color",
     "zone",
     "zone_color",
     "national_rank",
@@ -30,7 +34,40 @@
     "state_name": {"type": "string"},
     "state_abbr": {"type": "string", "minLength": 2, "maxLength": 2},
     "composite_score": {"type": "number", "minimum": 0, "maximum": 100},
-    "zone": {"enum": ["Healthy", "Normal", "Elevated", "Serious", "Crisis"]},
+    "score_gloss": {
+      "enum": [
+        "exceptionally low county distress",
+        "very low county distress",
+        "low county distress",
+        "low-moderate county distress",
+        "moderate-low county distress",
+        "moderate county distress",
+        "moderate-high county distress",
+        "high county distress",
+        "very high county distress",
+        "extreme county distress"
+      ]
+    },
+    "score_gloss_color": {"type": "string"},
+    "distress_fifth": {
+      "enum": [
+        "Least distressed fifth",
+        "Second-least distressed fifth",
+        "Middle fifth",
+        "Second-most distressed fifth",
+        "Most distressed fifth"
+      ]
+    },
+    "distress_fifth_color": {"type": "string"},
+    "zone": {
+      "enum": [
+        "Least distressed fifth",
+        "Second-least distressed fifth",
+        "Middle fifth",
+        "Second-most distressed fifth",
+        "Most distressed fifth"
+      ]
+    },
     "zone_color": {"type": "string"},
     "national_rank": {"type": "integer", "minimum": 1, "maximum": 3144},
     "national_rank_ordinal": {"type": "string"},

@@ -14,6 +14,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Optional, TypedDict
 
+from scripts.format import format_score
+
 CANONICAL_INSTITUTION = "American Default Research"
 CANONICAL_BRAND = "American Default"
 CANONICAL_PRODUCT = "American Distress Index"
@@ -44,7 +46,7 @@ def _format_value(value: Optional[float], unit: str) -> str:
         return f"{value:.1f}"
     if unit == "hours":
         return f"{value:.1f} hours"
-    if unit == "number":
+    if unit in ("number", "count"):
         return f"{value:,.0f}"
     return f"{value:.2f} {unit}"
 
@@ -60,20 +62,28 @@ def build_indicator_citation(
     latest_period: Optional[str],
     unit: str,
     year: Optional[int] = None,
+    historical: bool = False,
 ) -> IndicatorCitation:
     """Build APA / MLA / Chicago / news-copy citations for one indicator."""
     if year is None:
         year = _current_year()
-    display = branded_name or name
+    display = name or branded_name or ""
     url = f"{BASE_URL}/indicators/{slug}/"
     val_str = _format_value(latest_value, unit)
     period = latest_period or "current period"
 
-    newscopy = (
-        f"According to {CANONICAL_INSTITUTION}, {display} stands at {val_str} "
-        f"as of {period}. Source: {source}. "
-        f"({CANONICAL_BRAND} — {url})"
-    )
+    if historical:
+        newscopy = (
+            f"According to {CANONICAL_INSTITUTION}, the last verified {display} "
+            f"reading was {val_str} as of {period}. Source: {source}. "
+            f"({CANONICAL_BRAND} — {url})"
+        )
+    else:
+        newscopy = (
+            f"According to {CANONICAL_INSTITUTION}, {display} stands at {val_str} "
+            f"as of {period}. Source: {source}. "
+            f"({CANONICAL_BRAND} — {url})"
+        )
     apa = (
         f"{CANONICAL_INSTITUTION}. ({year}). {display} [Data set]. "
         f"{url}"
@@ -98,18 +108,27 @@ def build_indicator_citation(
 def build_adi_citation(
     *,
     quarter: str,
-    composite_score: float,
-    zone: str,
+    composite: float,
+    band: int,
+    band_label: str,
+    rank_reading: str,
     year: Optional[int] = None,
 ) -> IndicatorCitation:
-    """Build citations for the ADI composite itself (uses product name)."""
+    """Build citations for the ADI composite itself (uses product name).
+
+    The band label never publishes without a reading beside it. News copy
+    carries the composite's rank in its own published history, the one
+    public history reading (Ross 2026-09-29); the inputs-average reading is
+    methodology-only.
+    """
     if year is None:
         year = _current_year()
-    url = f"{BASE_URL}/adi/"
+    url = f"{BASE_URL}/methodology/"
     display = CANONICAL_PRODUCT
     newscopy = (
         f"The {display}, computed by {CANONICAL_INSTITUTION}, "
-        f"stood at {composite_score:.1f} ({zone}) in {quarter}. "
+        f"stood at {format_score(composite)} in {quarter} — band {band} of 5 "
+        f"({band_label}). {rank_reading}. "
         f"({CANONICAL_BRAND} — {url})"
     )
     apa = (
@@ -129,5 +148,5 @@ def build_adi_citation(
         "apa": apa,
         "mla": mla,
         "chicago": chicago,
-        "source_attribution": f"{CANONICAL_INSTITUTION} (PCA-derived composite)",
+        "source_attribution": f"{CANONICAL_INSTITUTION} (equal-weighted five-domain percentile composite)",
     }

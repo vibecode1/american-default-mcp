@@ -1,16 +1,17 @@
 """Pydantic response models for the MCP tool endpoints.
 
-Every response carries `schema_version: "v1"`. Breaking changes ship as
-a new tool name (e.g. `get_indicator_v2`) rather than mutating v1 — so
-clients can pin to a known contract.
+Every legacy response carries `schema_version: "v1"`. Breaking changes ship
+as a new tool name (e.g. `get_indicator_v2`) and explicit schema version rather
+than mutating v1, so clients can pin to a known contract.
 """
 from __future__ import annotations
 
-from typing import Any, Literal, Optional
+from typing import Dict, Any, Literal, Optional
 
 from pydantic import BaseModel, Field
 
 SCHEMA_VERSION = "v1"
+SCHEMA_VERSION_V2 = "v2"
 
 
 class Citation(BaseModel):
@@ -67,6 +68,21 @@ class IndicatorResponse(BaseModel):
     freshness_warning: bool = False
 
 
+class IndicatorResponseV2(IndicatorResponse):
+    """Versioned indicator response with comparison-safety metadata.
+
+    The original ``IndicatorResponse`` remains the byte/shape-stable v1
+    contract. Additions belong here (and in ``get_indicator_v2``), never in
+    the legacy model.
+    """
+
+    schema_version: Literal["v2"] = SCHEMA_VERSION_V2
+    trend_suppressed: Optional[str] = None
+    # Comparability boundaries for source redesigns. Aggregate windows are
+    # restricted to the current basis when this list is non-empty.
+    series_breaks: list[dict[str, Any]] = Field(default_factory=list)
+
+
 # ----------------------------------------------------------------------
 # get_county_scorecard
 # ----------------------------------------------------------------------
@@ -88,6 +104,15 @@ class ScorecardResponse(BaseModel):
     state_name: str
     state_abbr: str
     composite_score: float
+    score_gloss: str
+    score_gloss_color: str
+    # v1 rank-fifth label (enum-locked in get_county_scorecard_output.json) + its
+    # matching swatch color, both reconstructed from the retained `quintile` int
+    # after the blob dropped its fifth fields — a byte-identical v1 response. The
+    # score-gloss migration of these v1 fields is parked (PARKING LOT
+    # "Fifths → score-label sweep").
+    distress_fifth: str
+    distress_fifth_color: str
     zone: str
     zone_color: str
     national_rank: int
@@ -107,29 +132,37 @@ class ScorecardResponse(BaseModel):
 # ----------------------------------------------------------------------
 
 
-class ADIComponents(BaseModel):
-    buffer_z: float
-    debt_stress_z: float
-    financial_conditions_z: float
-    cost_pressure_z: float
-    labor_z: float
-    buffer_contribution: float
-    debt_stress_contribution: float
-    financial_conditions_contribution: float
-    cost_pressure_contribution: float
-    labor_contribution: float
+class ADIDomainScore(BaseModel):
+    score: float
+    members_present: int
+
+
+class ADIRankInHistory(BaseModel):
+    """The share of the other published quarters below the composite — distinct
+    from the composite value, which is a mean of input percentiles, not
+    itself a percentile of quarters."""
+
+    percent_of_quarters_below: float
+    reading: str
 
 
 class ADICompositeResponse(BaseModel):
+    """Family-v1 shape (cutover 2026-06-11). The band label never ships
+    without a reading beside it. `rank_in_history.reading` is the public
+    history reading (Ross 2026-09-29); `reading` is the inputs-average gloss
+    the methodology page explains, kept for v1 clients."""
+
     schema_version: Literal["v1"] = SCHEMA_VERSION
     quarter: str
-    date: str
-    composite_score: float
-    composite_z: float
-    zone: str
-    components: ADIComponents
+    composite: float
+    band: int
+    band_label: str
+    reading: str
+    rank_in_history: ADIRankInHistory
+    domains: Dict[str, ADIDomainScore]
+    members: Dict[str, float]
     methodology_url: str = "https://americandefault.org/methodology/"
-    url: str = "https://americandefault.org/adi/"
+    url: str = "https://americandefault.org/methodology/"
     citation: Citation
     as_of_date: Optional[str] = None
     freshness_warning: bool = False

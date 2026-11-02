@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from mcp.server.fastmcp.exceptions import ToolError
+from mcp.server.mcpserver.exceptions import ToolError
 
 from scripts.machine_layer.data_loaders import (
     load_indicator_registry,
@@ -165,10 +165,11 @@ def run(query: str, limit: int = DEFAULT_LIMIT) -> dict:
         for (_score_val, _len, slug, meta) in top
     ]
 
-    # `as_of_date` is the latest `$generated_at` across loaded bundles
-    # — closes the 2026-05-03 BONUS finding (spec promised registry-
-    # earliest-bundle timestamp; we surface registry-latest, which is
-    # more honest about "this listing reflects bundles as of X").
+    # `as_of_date` is the most recent data date across loaded bundles
+    # — closes the 2026-05-03 BONUS finding (spec promised a registry
+    # freshness date; we surface registry-latest, which is more honest
+    # about "this listing reflects data as of X"). Derived from bundle
+    # content (latest_date), so it is stable across an unchanged rebuild.
     # `freshness_warning` is False by construction: the listing is
     # metadata. Per-result freshness is the caller's responsibility
     # via `get_indicator(slug)`, which carries the indicator-level

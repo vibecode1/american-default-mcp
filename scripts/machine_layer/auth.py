@@ -28,7 +28,7 @@ from __future__ import annotations
 import logging
 import os
 
-from mcp.server.fastmcp.exceptions import ToolError
+from mcp.server.mcpserver.exceptions import ToolError
 
 logger = logging.getLogger(__name__)
 

@@ -11,7 +11,7 @@ Defaults:
 
 Both limits must be satisfied for a request to pass — the tighter bucket
 wins. Breach raises `ToolError("rate_limited: retry_after=<seconds>")`
-so FastMCP converts it to a protocol-level tool error with the message
+so the SDK converts it to a protocol-level tool error with the message
 preserved for the client.
 
 Bypass for tests:
@@ -26,7 +26,7 @@ import time
 from dataclasses import dataclass
 from typing import Callable
 
-from mcp.server.fastmcp.exceptions import ToolError
+from mcp.server.mcpserver.exceptions import ToolError
 
 logger = logging.getLogger(__name__)
 

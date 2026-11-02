@@ -1,6 +1,11 @@
-# Runtime deps for the MCP HTTP server. Kept lean so the production
-# container stays small (~150MB).
-mcp>=1.27.0,<1.28.0
+# Runtime deps for the MCP HTTP server only — kept lean so the Cloud
+# Run image stays small (~150MB vs ~700MB from full requirements.txt).
+#
+# This file — not requirements.txt — is what the Cloud Run image installs
+# (see Dockerfile). Keep the mcp pin here in step with requirements.txt and
+# requirements.lock; they drifted three ways before SDK 2.x (this file was
+# still on 1.27 while requirements.txt said 1.28).
+mcp>=2.3.0,<2.4.0
 uvicorn>=0.30
 starlette>=0.40
 jsonschema>=4.0

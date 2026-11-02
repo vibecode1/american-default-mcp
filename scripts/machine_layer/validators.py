@@ -27,7 +27,7 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError
-from mcp.server.fastmcp.exceptions import ToolError
+from mcp.server.mcpserver.exceptions import ToolError
 
 logger = logging.getLogger(__name__)
 
@@ -112,7 +112,7 @@ def known_tool_names() -> list[str]:
     """Return the list of tools that have a schema pair on disk.
 
     Used by tests to enumerate input/output schemas and assert every
-    tool registered with FastMCP has both schemas.
+    tool registered with the MCP server has both schemas.
     """
     inputs = {p.stem.removesuffix(_INPUT_SUFFIX) for p in SCHEMAS_DIR.glob(f"*{_INPUT_SUFFIX}.json")}
     outputs = {p.stem.removesuffix(_OUTPUT_SUFFIX) for p in SCHEMAS_DIR.glob(f"*{_OUTPUT_SUFFIX}.json")}

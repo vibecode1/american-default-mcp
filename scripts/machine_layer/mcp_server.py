@@ -4,6 +4,7 @@ Exposes read-only tool endpoints over Anthropic's Model Context Protocol:
 
     Session 1:
         - get_indicator(slug)
+        - get_indicator_v2(slug, response_version)
         - get_county_scorecard(fips)
         - get_adi_composite()
 
@@ -49,11 +50,14 @@ for _noisy in ("httpx", "anyio", "mcp.server.lowlevel.server"):
 
 from typing import Annotated  # noqa: E402
 
-from mcp.server.fastmcp import Context, FastMCP  # noqa: E402
+from mcp.server.mcpserver import Context, MCPServer  # noqa: E402
 from mcp.server.transport_security import TransportSecuritySettings  # noqa: E402
 from mcp.types import ToolAnnotations  # noqa: E402
 from pydantic import Field  # noqa: E402
 
+from scripts.canonical_facts import counts_indicators  # noqa: E402  (live indicator count; drift-proof)
+from scripts.distribution.index_products import load_index_products  # noqa: E402
+from scripts.format import format_count  # noqa: E402
 from scripts.machine_layer.auth import log_auth_attempt  # noqa: E402
 from scripts.machine_layer.rate_limit import check_and_consume  # noqa: E402
 from scripts.machine_layer.tools import (  # noqa: E402
@@ -61,18 +65,24 @@ from scripts.machine_layer.tools import (  # noqa: E402
     get_county_scorecard,
     get_cross_correlations,
     get_indicator,
+    get_indicator_v2,
     search_indicators,
 )
 
 SERVER_NAME = "american-default-mcp"
-SERVER_VERSION = "1.0.0-session-2"
+SERVER_VERSION = "1.1.1"
 SCHEMA_VERSION = "v1"
+SUPPORTED_SCHEMA_VERSIONS = ("v1", "v2")
+_index_products = load_index_products()["products"]
+CDI_JURISDICTION_COUNT = int(
+    _index_products["cdi"]["coverage"]["jurisdiction_count"]
+)
 
 
 def _build_transport_security() -> TransportSecuritySettings:
     """DNS-rebinding protection config for the streamable-HTTP transport.
 
-    FastMCP's default rejects any Host header other than ``localhost`` /
+    The SDK's default rejects any Host header other than ``localhost`` /
     ``127.0.0.1`` with HTTP 421 to defend against DNS-rebinding attacks
     that target browser-origin clients. Cloud Run's hostname trips this.
 
@@ -95,9 +105,29 @@ def _build_transport_security() -> TransportSecuritySettings:
     return TransportSecuritySettings(enable_dns_rebinding_protection=False)
 
 
-# The FastMCP app is constructed at module load so tests can import it and
+# The MCPServer app is constructed at module load so tests can import it and
 # invoke tools in-process via create_connected_server_and_client_session.
-mcp = FastMCP(name=SERVER_NAME, transport_security=_build_transport_security())
+#
+# SDK 2.x moved transport security off the constructor and onto the ASGI app
+# builder, so `_build_transport_security()` is applied in `streamable_http_app()`
+# at the two call sites that serve HTTP. stdio never had a Host header to check.
+mcp = MCPServer(
+    name=SERVER_NAME,
+    title="American Default Research",
+    version=SERVER_VERSION,
+    website_url="https://americandefault.org/press/mcp/",
+    instructions=(
+        "Research U.S. household financial distress using public indicators, "
+        "county scorecards, and the American Distress Index. Search indicators "
+        "before choosing a slug. Prefer get_indicator_v2 for comparisons: respect "
+        "series_breaks, trend_suppressed, observation dates, and freshness warnings. "
+        "Cite the original publisher and the American Default Research page returned "
+        "with each result. Indexes describe conditions; they do not forecast outcomes "
+        "or determine an individual's eligibility for financial services. "
+        "Our analysis is free to use with attribution to American Default Research. "
+        "Source data stays under each publisher's terms; cite the source named here."
+    ),
+)
 
 
 # ----------------------------------------------------------------------
@@ -145,7 +175,7 @@ def _gate(ctx: Context | None, tool_name: str) -> None:
         "Chicago / news-copy citations. Raw historical series is NOT "
         "included — use https://americandefault.org/api/indicators/{slug}.json "
         "for the full data. Slug examples: 'the-buffer' (personal savings "
-        "rate), 'mortgage-delinquency', 'initial-unemployment-claims-sa'."
+        "rate), 'mortgage-delinquency-rate', 'initial-unemployment-claims-sa'."
     ),
     annotations=ToolAnnotations(
         title="Get indicator",
@@ -161,9 +191,9 @@ def _get_indicator(
         Field(
             description=(
                 "The kebab-case indicator slug (e.g., 'the-buffer' for personal "
-                "savings rate, 'mortgage-delinquency', 'initial-unemployment-claims-sa'). "
-                "96 indicators available. Use `search_indicators` first to discover "
-                "which slug corresponds to a concept."
+                "savings rate, 'mortgage-delinquency-rate', 'initial-unemployment-claims-sa'). "
+                f"{counts_indicators} indicators available. Use `search_indicators` first "
+                "to discover which slug corresponds to a concept."
             ),
         ),
     ],
@@ -175,16 +205,62 @@ def _get_indicator(
 
 
 @mcp.tool(
+    name="get_indicator_v2",
+    description=(
+        "Fetch an explicitly versioned compact indicator snapshot. Returns "
+        "the latest value and canonical citation plus `trend_suppressed` and "
+        "`series_breaks` comparison-safety fields. Callers must pass "
+        "`response_version='v2'`; unsupported versions fail closed. The "
+        "legacy `get_indicator` tool remains pinned to its original v1 shape."
+    ),
+    annotations=ToolAnnotations(
+        title="Get indicator (v2)",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=False,
+    ),
+)
+def _get_indicator_v2(
+    slug: Annotated[
+        str,
+        Field(
+            description=(
+                "The kebab-case indicator slug (e.g., 'the-buffer' or "
+                "'the-pinch'). Use `search_indicators` to discover slugs."
+            ),
+        ),
+    ],
+    response_version: Annotated[
+        str,
+        Field(
+            description=(
+                "Required explicit response contract version. The only "
+                "supported value for this tool is 'v2'."
+            ),
+            json_schema_extra={"const": "v2"},
+        ),
+    ],
+    ctx: Context | None = None,
+) -> dict:
+    """Fetch a v2 indicator snapshot with comparison-safety metadata."""
+    _gate(ctx, "get_indicator_v2")
+    return get_indicator_v2.run(slug, response_version=response_version)
+
+
+@mcp.tool(
     name="get_county_scorecard",
     description=(
         "Fetch a county's County Distress Index (CDI) scorecard by 5-digit "
-        "FIPS code. Returns composite score (0-100), zone (Healthy / "
-        "Normal / Elevated / Serious / Crisis), national + state rank, "
-        "5-domain breakdown (Consumer Credit Distress, Housing Cost "
-        "Burden, Structural Poverty, Economic Vitality, Legal Distress), "
+        "FIPS code. Returns the 0-100 score (the share of the other U.S. "
+        "counties with a lower composite, rounded down; field "
+        "composite_score), score label, national + state rank "
+        "(national_rank_ordinal is filled only for the top and bottom 100, "
+        "where the site prints it), 5-domain breakdown (Delinquency, "
+        "Default & Legal, Debt Burden, Labor, Safety Net & Buffer), "
         "key findings, and pre-baked APA / MLA / Chicago / news-copy "
         "citations. Accepts 4-digit FIPS with implicit leading zero. "
-        "3,144 counties available."
+        f"{format_count(CDI_JURISDICTION_COUNT)} counties available."
     ),
     annotations=ToolAnnotations(
         title="Get county scorecard",
@@ -201,7 +277,7 @@ def _get_county_scorecard(
             description=(
                 "The 5-digit numeric county FIPS code as a string (e.g., '13063' "
                 "for Clayton County, GA). 4-digit values are zero-padded internally. "
-                "3,144 counties available."
+                f"{format_count(CDI_JURISDICTION_COUNT)} counties available."
             ),
         ),
     ],
@@ -216,10 +292,12 @@ def _get_county_scorecard(
     name="get_adi_composite",
     description=(
         "Fetch the latest quarterly reading of the American Distress Index "
-        "(ADI) composite. Returns composite score (0-100), zone, composite "
-        "Z-score, and the 5-component breakdown (Buffer, Debt Stress, "
-        "Financial Conditions, Cost Pressure, Labor) with Z-scores and "
-        "point contributions. Updated quarterly."
+        "(ADI) composite. Returns the composite score (0-100), band (1-5) "
+        "with its label, the composite's rank in its own published history "
+        "(rank_in_history.reading: quote this beside the band label), the "
+        "methodology reading of the inputs, and the five-domain breakdown (Delinquency, "
+        "Default & Legal, Debt Burden, Labor, Safety Net & Buffer) with "
+        "domain scores and member component percentiles. Updated quarterly."
     ),
     annotations=ToolAnnotations(
         title="Get ADI composite",
@@ -232,8 +310,10 @@ def _get_county_scorecard(
 def _get_adi_composite(ctx: Context | None = None) -> dict:
     """Fetch the latest American Distress Index (ADI) composite reading.
 
-    No parameters. Returns the most recent quarter's composite score, zone,
-    and 5-component breakdown.
+    No parameters. Returns the most recent quarter's composite score, band
+    and label, rank in history (the public reading, Ross 2026-09-29), the
+    methodology reading of the inputs, and the five-domain breakdown with
+    member percentiles.
     """
     _gate(ctx, "get_adi_composite")
     return get_adi_composite.run()
@@ -242,7 +322,7 @@ def _get_adi_composite(ctx: Context | None = None) -> dict:
 @mcp.tool(
     name="search_indicators",
     description=(
-        "Search the 96-indicator registry by keyword. Returns ranked "
+        f"Search the {counts_indicators}-indicator registry by keyword. Returns ranked "
         "matches (up to `limit`, default 10, max 50) with slug, branded "
         "name, underlying name, category, and canonical URL. Scoring is "
         "substring+prefix over slug, branded_name, name, and category — "
@@ -282,7 +362,7 @@ def _search_indicators(
     ] = 10,
     ctx: Context | None = None,
 ) -> dict:
-    """Search the 96-indicator registry by keyword."""
+    """Search the indicator registry by keyword."""
     _gate(ctx, "search_indicators")
     return search_indicators.run(query, limit=limit)
 
@@ -297,9 +377,9 @@ def _search_indicators(
         "Returns two lists: `as_leader` (pairs where this indicator "
         "precedes its follower) and `as_follower` (pairs where another "
         "indicator precedes this one). Only fully-validated pairs are "
-        "included — partial matches are not surfaced. Most of the 96 "
-        "indicators return empty lists; currently six pairs clear the "
-        "full gauntlet."
+        f"included — partial matches are not surfaced. Most of the "
+        f"{counts_indicators} indicators return empty lists; only a handful "
+        "of pairs clear the full gauntlet."
     ),
     annotations=ToolAnnotations(
         title="Get cross-correlations",
@@ -355,6 +435,7 @@ def probe_handshake(transport: str = "stdio") -> dict:
         "server_name": SERVER_NAME,
         "server_version": SERVER_VERSION,
         "schema_version": SCHEMA_VERSION,
+        "supported_schema_versions": list(SUPPORTED_SCHEMA_VERSIONS),
         "sdk_version": sdk_version,
         "transport": transport,
         "tools": tools,
@@ -418,14 +499,18 @@ def main(argv: list[str] | None = None) -> int:
 
         from scripts.machine_layer.http_app import build_app
 
-        app = build_app(mcp.streamable_http_app())
+        app = build_app(
+            mcp.streamable_http_app(
+                transport_security=_build_transport_security()
+            )
+        )
         logger.info("mcp-http-listening host=%s port=%d", args.host, args.port)
         uvicorn.run(
             app,
             host=args.host,
             port=args.port,
             log_level="info",
-            access_log=False,  # FastMCP + our middleware emit structured logs
+            access_log=False,  # the SDK + our middleware emit structured logs
         )
         return 0
 
