@@ -54,12 +54,25 @@ files maintained separately. Cloning this repository alone does not provide a
 complete local data installation. Connect to the hosted endpoint above for
 normal use; no local process, API key or data download is needed.
 
-For Cline and Cursor, add this to the client's MCP server configuration:
+For Cursor, add this to the client's MCP server configuration:
 
 ```json
 {
   "mcpServers": {
     "american-default-research": {
+      "url": "https://mcp.americandefault.org/mcp"
+    }
+  }
+}
+```
+
+For Cline, set the transport explicitly in `cline_mcp_settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "american-default-research": {
+      "type": "streamableHttp",
       "url": "https://mcp.americandefault.org/mcp"
     }
   }
