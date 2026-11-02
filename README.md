@@ -22,6 +22,23 @@ Anonymous access allows 10 calls per minute and 60 per hour per IP block.
 Higher-volume users can request an issued key through the public documentation.
 The static JSON endpoints are the suitable route for permitted bulk downloads.
 
+## Domain discovery
+
+The main domain advertises the connector at
+`https://americandefault.org/.well-known/ai-catalog.json`. Its entry points to
+`https://mcp.americandefault.org/mcp/server-card`, using the experimental
+[MCP Server Card format](https://github.com/modelcontextprotocol/ext-server-card).
+This format describes identity and connection details; tools remain discoverable
+through the MCP protocol.
+
+For clients using Cloudflare's earlier discovery convention, both domains serve
+`/.well-known/mcp/server-card.json`. That compatibility card includes the exact
+tool descriptions and input schemas returned by the running SDK. The main-domain
+route proxies only this public metadata from the MCP host, without forwarding
+cookies or authorization. Cards support CORS, HEAD and conditional ETag requests.
+The registry metadata supplies the same name and version used at initialization.
+Discovery metadata does not grant access or guarantee agent recommendations.
+
 ## Research examples
 
 - Find indicators about mortgage delinquency, then retrieve the latest reading
@@ -42,45 +59,37 @@ The static JSON endpoints are the suitable route for permitted bulk downloads.
 | `get_cross_correlations` | Indicator `slug` | Validated research relationships; empty results are normal |
 
 Prefer v2 when comparing indicators. A series break or a suppressed trend means
-readings may not be comparable. Historical indicators are not presented
+readings may not be comparable. Observation frequency and release cadence can
+differ: freshness uses the source's declared `freshness_cadence` when present.
+Monthly dates retain their original first-of-month convention, while warning
+age starts at the reporting month's end. Historical indicators are not presented
 as current. Full histories, where available, are at
 `https://americandefault.org/api/indicators/{slug}.json`.
 
-## Source and installation
+## Local development
 
-This public repository is a source reference for the hosted connector. The
-production service also uses shared formatting, index metadata and public data
-files maintained separately. Cloning this repository alone does not provide a
-complete local data installation. Connect to the hosted endpoint above for
-normal use; no local process, API key or data download is needed.
+Use Python 3.12 or later and install `scripts/machine_layer/requirements-server.txt`
+in an isolated environment. That file carries the deployed MCP SDK constraint.
 
-For Cursor, add this to the client's MCP server configuration:
-
-```json
-{
-  "mcpServers": {
-    "american-default-research": {
-      "url": "https://mcp.americandefault.org/mcp"
-    }
-  }
-}
+```bash
+PYTHONPATH=. python -m scripts.machine_layer.mcp_server --probe
+PYTHONPATH=. python -m scripts.machine_layer.mcp_server
+PYTHONPATH=. python -m scripts.machine_layer.mcp_server --transport http
 ```
 
-For Cline, set the transport explicitly in `cline_mcp_settings.json`:
+The default transport is stdio. HTTP listens on `PORT` (default 8080).
+Health endpoint: `/up`. Logs go to stderr. Local stdio clients must set the
+repository as their working directory and `PYTHONPATH=.`.
 
-```json
-{
-  "mcpServers": {
-    "american-default-research": {
-      "type": "streamableHttp",
-      "url": "https://mcp.americandefault.org/mcp"
-    }
-  }
-}
+Focused regressions:
+
+```bash
+PYTHONPATH=. python -m pytest scripts/tests/test_mcp_submission_readiness.py scripts/tests/test_fp42_mcp_cache_invalidation.py
 ```
 
-All six tools are read-only. Invalid slugs or county codes return errors rather
-than fabricated results. The hosted HTTP health endpoint is `/up`.
+Existing tool names and v1/v2 response schemas remain compatible. Additions use
+an explicitly versioned contract. Every tool validates its inputs and outputs;
+invalid slugs or county codes return errors rather than fabricated results.
 
 ## Attribution and privacy
 
@@ -90,7 +99,3 @@ These research tools do not need conversation history, account credentials,
 private documents, or personal financial details. Request bodies and bearer
 credentials must not be logged. The site's privacy policy is
 https://americandefault.org/privacy/.
-
-## Directory listing
-
-[![American Default Research on AllMCPs](https://allmcps.com/api/badge/american-default-research-2?style=shield)](https://allmcps.com/mcp/american-default-research-2?verify=fa4d8f81-778e-4788-bf5e-02d9f2663ea5)
