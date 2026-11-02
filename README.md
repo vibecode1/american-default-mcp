@@ -90,3 +90,7 @@ These research tools do not need conversation history, account credentials,
 private documents, or personal financial details. Request bodies and bearer
 credentials must not be logged. The site's privacy policy is
 https://americandefault.org/privacy/.
+
+## Directory listing
+
+[![American Default Research on AllMCPs](https://allmcps.com/api/badge/american-default-research-2?style=shield)](https://allmcps.com/mcp/american-default-research-2?verify=fa4d8f81-778e-4788-bf5e-02d9f2663ea5)
