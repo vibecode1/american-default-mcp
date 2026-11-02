@@ -1,0 +1,133 @@
+{
+  "recorded_at_utc": "2026-11-02T15:03:35Z",
+  "endpoint": "https://mcp.americandefault.org/mcp",
+  "mode": "Actual live MCP SDK calls; protocol demonstration, not a ChatGPT conversation recording",
+  "cases": [
+    {
+      "title": "Find indicators",
+      "review_prompt": "Find American Default indicators about mortgage delinquency.",
+      "tool": "search_indicators",
+      "arguments": {
+        "query": "mortgage delinquency",
+        "limit": 3
+      },
+      "expected": "success",
+      "is_error": false,
+      "response": [
+        "{\n  \"schema_version\": \"v1\",\n  \"query\": \"mortgage delinquency\",\n  \"count\": 3,\n  \"results\": [\n    {\n      \"slug\": \"mortgage-delinquency-rate\",\n      \"branded_name\": \"Delinquency Rate on Single-Family Residential Mortgages, All Commercial Banks\",\n      \"name\": \"Delinquency Rate on Single-Family Residential Mortgages, All Commercial Banks\",\n      \"category\": \"debt_stress\",\n      \"url\": \"https://americandefault.org/indicators/mortgage-delinquency-rate/\"\n    },\n    {\n      \"slug\": \"mortgage-debt-service-ratio\",\n      \"branded_name\": \"Mortgage Debt Service Ratio\",\n      \"name\": \"Mortgage Debt Service Ratio\",\n      \"category\": \"buffer_depletion\",\n      \"url\": \"https://americandefault.org/indicators/mortgage-debt-service-ratio/\"\n    },\n    {\n      \"slug\": \"mortgage-origination-volume\",\n      \"branded_name\": \"Mortgage Origination Volume\",\n      \"name\": \"Mortgage Origination Volume\",\n      \"category\": \"debt_stress\",\n      \"url\": \"https://americandefault.org/indicators/mortgage-origination-volume/\"\n    }\n  ],\n  \"as_of_date\": \"2026-10-24\",\n  \"freshness_warning\": false\n}"
+      ],
+      "passed": true,
+      "elapsed_seconds": 0.179
+    },
+    {
+      "title": "Cite a national figure",
+      "review_prompt": "Retrieve the personal saving rate with period, source and citation.",
+      "tool": "get_indicator_v2",
+      "arguments": {
+        "slug": "the-buffer",
+        "response_version": "v2"
+      },
+      "expected": "success",
+      "is_error": false,
+      "response": [
+        "{\n  \"schema_version\": \"v2\",\n  \"status\": \"ok\",\n  \"slug\": \"the-buffer\",\n  \"branded_name\": \"The Buffer\",\n  \"name\": \"Personal Saving Rate\",\n  \"unit\": \"percent\",\n  \"frequency\": \"monthly\",\n  \"direction\": \"lower_is_worse\",\n  \"category\": \"buffer_depletion\",\n  \"latest_value\": 3.8,\n  \"latest_period\": \"2026-09\",\n  \"source\": \"BEA via FRED\",\n  \"source_url\": \"https://fred.stlouisfed.org/series/PSAVERT\",\n  \"url\": \"https://americandefault.org/indicators/the-buffer/\",\n  \"aggregates\": {\n    \"period_averages\": {\n      \"pre-pandemic\": {\n        \"from_period\": \"2015-01\",\n        \"to_period\": \"2019-12\",\n        \"avg\": 6.1417,\n        \"min\": 4.9,\n        \"max\": 8.5,\n        \"range_pp\": [\n          4.9,\n          8.5\n        ]\n      },\n      \"post-pandemic\": {\n        \"from_period\": \"2020-01\",\n        \"to_period\": \"2024-12\",\n        \"avg\": 8.4717,\n        \"min\": 2.4,\n        \"max\": 31.8,\n        \"range_pp\": [\n          2.4,\n          31.8\n        ]\n      },\n      \"pre-gfc\": {\n        \"from_period\": \"2000-01\",\n        \"to_period\": \"2007-06\",\n        \"avg\": 4.1067,\n        \"min\": 1.4,\n        \"max\": 6.9,\n        \"range_pp\": [\n          1.4,\n          6.9\n        ]\n      },\n      \"gfc-trough\": {\n        \"from_period\": \"2008-01\",\n        \"to_period\": \"2010-12\",\n        \"avg\": 5.2639,\n        \"min\": 2.4,\n        \"max\": 7.8,\n        \"range_pp\": [\n          2.4,\n          7.8\n        ]\n      },\n      \"trailing-12-months\": {\n        \"from_period\": \"2025-10\",\n        \"to_period\": \"2026-09\",\n        \"avg\": 4.6917,\n        \"min\": 3.8,\n        \"max\": 5.6,\n        \"range_pp\": [\n          3.8,\n          5.6\n        ]\n      },\n      \"trailing-36-months\": {\n        \"from_period\": \"2023-10\",\n        \"to_period\": \"2026-09\",\n        \"avg\": 5.5833,\n        \"min\": 3.8,\n        \"max\": 7.2,\n        \"range_pp\": [\n          3.8,\n          7.2\n        ]\n      },\n      \"trailing-60-months\": {\n        \"from_period\": \"2021-10\",\n        \"to_period\": \"2026-09\",\n        \"avg\": 5.2967,\n        \"min\": 2.4,\n        \"max\": 7.2,\n        \"range_pp\": [\n          2.4,\n          7.2\n        ]\n      },\n      \"trailing-120-months\": {\n        \"from_period\": \"2016-10\",\n        \"to_period\": \"2026-09\",\n        \"avg\": 7.2033,\n        \"min\": 2.4,\n        \"max\": 31.8,\n        \"range_pp\": [\n          2.4,\n          31.8\n        ]\n      }\n    },\n    \"extremes\": {\n      \"all-time\": {\n        \"epoch_start\": null,\n        \"epoch_end\": null,\n        \"peak\": {\n          \"value\": 31.8,\n          \"period\": \"2020-04\",\n          \"date\": \"2020-04-01\"\n        },\n        \"trough\": {\n          \"value\": 1.4,\n          \"period\": \"2005-07\",\n          \"date\": \"2005-07-01\"\n        }\n      },\n      \"ex-covid\": {\n        \"epoch_start\": null,\n        \"epoch_end\": null,\n        \"peak\": {\n          \"value\": 26.2,\n          \"period\": \"2021-03\",\n          \"date\": \"2021-03-01\"\n        },\n        \"trough\": {\n          \"value\": 1.4,\n          \"period\": \"2005-07\",\n          \"date\": \"2005-07-01\"\n        }\n      },\n      \"since-2000\": {\n        \"epoch_start\": \"2000-01\",\n        \"epoch_end\": null,\n        \"peak\": {\n          \"value\": 31.8,\n          \"period\": \"2020-04\",\n          \"date\": \"2020-04-01\"\n        },\n        \"trough\": {\n          \"value\": 1.4,\n          \"period\": \"2005-07\",\n          \"date\": \"2005-07-01\"\n        }\n      },\n      \"since-2008\": {\n        \"epoch_start\": \"2008-01\",\n        \"epoch_end\": null,\n        \"peak\": {\n          \"value\": 31.8,\n          \"period\": \"2020-04\",\n          \"date\": \"2020-04-01\"\n        },\n        \"trough\": {\n          \"value\": 2.4,\n          \"period\": \"2008-04\",\n          \"date\": \"2008-04-01\"\n        }\n      },\n      \"since-2010\": {\n        \"epoch_start\": \"2010-01\",\n        \"epoch_end\": null,\n        \"peak\": {\n          \"value\": 31.8,\n          \"period\": \"2020-04\",\n          \"date\": \"2020-04-01\"\n        },\n        \"trough\": {\n          \"value\": 2.4,\n          \"period\": \"2022-06\",\n          \"date\": \"2022-06-01\"\n        }\n      },\n      \"since-2020\": {\n        \"epoch_start\": \"2020-01\",\n        \"epoch_end\": null,\n        \"peak\": {\n          \"value\": 31.8,\n          \"period\": \"2020-04\",\n          \"date\": \"2020-04-01\"\n        },\n        \"trough\": {\n          \"value\": 2.4,\n          \"period\": \"2022-06\",\n          \"date\": \"2022-06-01\"\n        }\n      }\n    },\n    \"sustained_runs\": [\n      {\n        \"threshold\": 5.8,\n        \"direction\": \"below\",\n        \"start_period\": \"2025-05\",\n        \"end_period\": null,\n        \"count_periods\": 17,\n        \"current\": true\n      },\n      {\n        \"threshold\": 8.2,\n        \"direction\": \"below\",\n        \"start_period\": \"2021-09\",\n        \"end_period\": null,\n        \"count_periods\": 61,\n        \"current\": true\n      },\n      {\n        \"threshold\": 11.1,\n        \"direction\": \"below\",\n        \"start_period\": \"2021-05\",\n        \"end_period\": null,\n        \"count_periods\": 65,\n        \"current\": true\n      }\n    ]\n  },\n  \"prose\": {\n    \"headline\": \"Personal saving rate at 3.8% in September 2026, down from 5.1% a year earlier\",\n    \"card_context\": \"personal saving rate \u2014 down from a year earlier\",\n    \"card_verdict\": \"The personal saving rate is lower than a year earlier\"\n  },\n  \"citation\": {\n    \"newscopy\": \"According to American Default Research, Personal Saving Rate stands at 3.8% as of 2026-09. Source: BEA via FRED. (American Default \u2014 https://americandefault.org/indicators/the-buffer/)\",\n    \"apa\": \"American Default Research. (2026). Personal Saving Rate [Data set]. https://americandefault.org/indicators/the-buffer/\",\n    \"mla\": \"\\\"Personal Saving Rate.\\\" American Default Research, 2026, americandefault.org/indicators/the-buffer/.\",\n    \"chicago\": \"American Default Research. \\\"Personal Saving Rate.\\\" Accessed 2026. https://americandefault.org/indicators/the-buffer/.\",\n    \"source_attribution\": \"BEA via FRED\"\n  },\n  \"as_of_date\": \"2026-09-01\",\n  \"freshness_warning\": false,\n  \"trend_suppressed\": null,\n  \"series_breaks\": []\n}"
+      ],
+      "passed": true,
+      "elapsed_seconds": 0.199
+    },
+    {
+      "title": "County research",
+      "review_prompt": "Retrieve King County, Washington, FIPS 53033.",
+      "tool": "get_county_scorecard",
+      "arguments": {
+        "fips": "53033"
+      },
+      "expected": "success",
+      "is_error": false,
+      "response": [
+        "{\n  \"schema_version\": \"v1\",\n  \"fips\": \"53033\",\n  \"county_name\": \"King County\",\n  \"state_name\": \"Washington\",\n  \"state_abbr\": \"WA\",\n  \"composite_score\": 23.0,\n  \"score_gloss\": \"low county distress\",\n  \"score_gloss_color\": \"#22c55e\",\n  \"distress_fifth\": \"Second-least distressed fifth\",\n  \"distress_fifth_color\": \"#3b82f6\",\n  \"zone\": \"Second-least distressed fifth\",\n  \"zone_color\": \"#3b82f6\",\n  \"national_rank\": 2421,\n  \"national_rank_ordinal\": \"\",\n  \"state_rank\": 37,\n  \"population\": 2271380,\n  \"domain_breakdown\": [\n    {\n      \"name\": \"Debt Burden (housing basis)\",\n      \"score\": 77.0,\n      \"weight_pct\": 20.0,\n      \"rank\": 505,\n      \"percentile\": null,\n      \"primary_driver\": true\n    },\n    {\n      \"name\": \"Labor\",\n      \"score\": 53.0,\n      \"weight_pct\": 20.0,\n      \"rank\": 1447,\n      \"percentile\": null,\n      \"primary_driver\": false\n    },\n    {\n      \"name\": \"Default & Legal\",\n      \"score\": 16.0,\n      \"weight_pct\": 20.0,\n      \"rank\": 2880,\n      \"percentile\": null,\n      \"primary_driver\": false\n    },\n    {\n      \"name\": \"Delinquency\",\n      \"score\": 14.0,\n      \"weight_pct\": 20.0,\n      \"rank\": 2862,\n      \"percentile\": null,\n      \"primary_driver\": false\n    },\n    {\n      \"name\": \"Safety Net & Buffer\",\n      \"score\": 11.0,\n      \"weight_pct\": 20.0,\n      \"rank\": 3001,\n      \"percentile\": null,\n      \"primary_driver\": false\n    }\n  ],\n  \"key_findings\": [\n    \"<strong>37th of 39 counties in Washington</strong> on the County Distress Index \u2014 23 \u00b7 low county distress, more distressed than 23% of U.S. counties.\",\n    \"<strong>A rent-to-income ratio of 25%</strong> (U.S. median 21%). Rent-to-income ratio at the 84th percentile nationally. Source: HUD FMR (FY2027); U.S. Census Bureau, SAIPE (2024).\",\n    \"<strong>Unemployment (average of monthly rates) at 5%</strong> \u2014 national median 4%, ranked at the 80th percentile. Source: U.S. Bureau of Labor Statistics, LAUS (monthly rates averaged, September 2025 to August 2026; no figures published for October 2025).\",\n    \"<strong>Default & Legal domain score 16</strong> \u2014 weight 20.0% of the CDI composite. Source: American Default Research.\",\n    \"<strong>Delinquency domain score 14</strong> \u2014 weight 20.0% of the CDI composite. Source: American Default Research.\"\n  ],\n  \"url\": \"https://americandefault.org/counties/washington/king-county-wa/\",\n  \"citation\": {\n    \"newscopy\": \"According to the County Distress Index from American Default Research, King County, Washington ranks 37th of 39 Washington counties with a score of 23, more distressed than 23% of U.S. counties. (Data through August 2026.)\",\n    \"apa\": \"American Default Research. (2026). King County, Washington: County Distress Profile [Dataset]. https://americandefault.org/counties/washington/king-county-wa/ (Data through August 2026)\",\n    \"mla\": \"American Default Research. \\\"King County, Washington: County Distress Profile.\\\" County Distress Index, October 26, 2026, americandefault.org/counties/washington/king-county-wa/.\",\n    \"chicago\": \"American Default Research. \\\"King County, Washington: County Distress Profile.\\\" County Distress Index. Data through August 2026. https://americandefault.org/counties/washington/king-county-wa/.\",\n    \"source_attribution\": \"American Default Research (County Distress Index)\"\n  },\n  \"as_of_date\": \"2026-08-31\",\n  \"freshness_warning\": false\n}"
+      ],
+      "passed": true,
+      "elapsed_seconds": 0.164
+    },
+    {
+      "title": "Published national index",
+      "review_prompt": "Read the latest published ADI without forecasting.",
+      "tool": "get_adi_composite",
+      "arguments": {},
+      "expected": "success",
+      "is_error": false,
+      "response": [
+        "{\n  \"schema_version\": \"v1\",\n  \"quarter\": \"2026-Q2\",\n  \"composite\": 46.99,\n  \"band\": 3,\n  \"band_label\": \"Typical\",\n  \"reading\": \"On average, its inputs sit higher than in 47% of their own quarterly histories\",\n  \"rank_in_history\": {\n    \"percent_of_quarters_below\": 44.7,\n    \"reading\": \"The composite itself sits higher than 44% of all published quarters since 2005\"\n  },\n  \"domains\": {\n    \"delinquency\": {\n      \"score\": 61.56,\n      \"members_present\": 4\n    },\n    \"default_legal\": {\n      \"score\": 44.85,\n      \"members_present\": 2\n    },\n    \"debt_burden\": {\n      \"score\": 21.51,\n      \"members_present\": 1\n    },\n    \"labor\": {\n      \"score\": 16.44,\n      \"members_present\": 2\n    },\n    \"safety_net_buffer\": {\n      \"score\": 90.59,\n      \"members_present\": 1\n    }\n  },\n  \"members\": {\n    \"mortgage_delinquency\": 27.94,\n    \"credit_card_delinquency\": 67.42,\n    \"consumer_loan_delinquency\": 52.45,\n    \"auto_loan_delinquency\": 98.4,\n    \"credit_card_chargeoff\": 66.67,\n    \"foreclosure_chargeoff_proxy\": 23.04,\n    \"debt_service_ratio\": 21.51,\n    \"unemployment_rate\": 24.76,\n    \"initial_claims\": 8.12,\n    \"savings_rate\": 90.59\n  },\n  \"methodology_url\": \"https://americandefault.org/methodology/\",\n  \"url\": \"https://americandefault.org/methodology/\",\n  \"citation\": {\n    \"newscopy\": \"The American Distress Index, computed by American Default Research, stood at 47.0 in 2026-Q2 \u2014 band 3 of 5 (Typical). The composite itself sits higher than 44% of all published quarters since 2005. (American Default \u2014 https://americandefault.org/methodology/)\",\n    \"apa\": \"American Default Research. (2026). American Distress Index [Data set]. https://americandefault.org/methodology/\",\n    \"mla\": \"\\\"American Distress Index.\\\" American Default Research, 2026, americandefault.org/methodology/.\",\n    \"chicago\": \"American Default Research. \\\"American Distress Index.\\\" Accessed 2026. https://americandefault.org/methodology/.\",\n    \"source_attribution\": \"American Default Research (equal-weighted five-domain percentile composite)\"\n  },\n  \"as_of_date\": \"2026-06-30\",\n  \"freshness_warning\": false\n}"
+      ],
+      "passed": true,
+      "elapsed_seconds": 0.184
+    },
+    {
+      "title": "Survey comparability",
+      "review_prompt": "Read the-pinch with its survey-break warnings.",
+      "tool": "get_indicator_v2",
+      "arguments": {
+        "slug": "the-pinch",
+        "response_version": "v2"
+      },
+      "expected": "success",
+      "is_error": false,
+      "response": [
+        "{\n  \"schema_version\": \"v2\",\n  \"status\": \"ok\",\n  \"slug\": \"the-pinch\",\n  \"branded_name\": \"The Pinch\",\n  \"name\": \"Difficulty Paying Usual Household Expenses\",\n  \"unit\": \"percent\",\n  \"frequency\": \"biweekly\",\n  \"direction\": \"higher_is_worse\",\n  \"category\": null,\n  \"latest_value\": 21.3,\n  \"latest_period\": \"2026-08-03\",\n  \"source\": \"Census Bureau Household Pulse Survey\",\n  \"source_url\": \"https://www.census.gov/data/experimental-data-products/household-pulse-survey.html\",\n  \"url\": \"https://americandefault.org/indicators/the-pinch/\",\n  \"aggregates\": {\n    \"period_averages\": {},\n    \"extremes\": {\n      \"all-time\": {\n        \"epoch_start\": null,\n        \"epoch_end\": null,\n        \"peak\": {\n          \"value\": 22.7,\n          \"period\": \"2026-03\",\n          \"date\": \"2026-03-30\"\n        },\n        \"trough\": {\n          \"value\": 21.3,\n          \"period\": \"2026-08\",\n          \"date\": \"2026-08-03\"\n        }\n      }\n    },\n    \"sustained_runs\": [\n      {\n        \"threshold\": 21.65,\n        \"direction\": \"below\",\n        \"start_period\": \"2026-08\",\n        \"end_period\": null,\n        \"count_periods\": 1,\n        \"current\": true\n      },\n      {\n        \"threshold\": 22.0,\n        \"direction\": \"below\",\n        \"start_period\": \"2026-08\",\n        \"end_period\": null,\n        \"count_periods\": 1,\n        \"current\": true\n      },\n      {\n        \"threshold\": 22.35,\n        \"direction\": \"below\",\n        \"start_period\": \"2026-08\",\n        \"end_period\": null,\n        \"count_periods\": 1,\n        \"current\": true\n      }\n    ]\n  },\n  \"prose\": {\n    \"headline\": null,\n    \"card_context\": null,\n    \"card_verdict\": null\n  },\n  \"citation\": {\n    \"newscopy\": \"According to American Default Research, Difficulty Paying Usual Household Expenses stands at 21.3% as of 2026-08-03. Source: Census Bureau Household Pulse Survey. (American Default \u2014 https://americandefault.org/indicators/the-pinch/)\",\n    \"apa\": \"American Default Research. (2026). Difficulty Paying Usual Household Expenses [Data set]. https://americandefault.org/indicators/the-pinch/\",\n    \"mla\": \"\\\"Difficulty Paying Usual Household Expenses.\\\" American Default Research, 2026, americandefault.org/indicators/the-pinch/.\",\n    \"chicago\": \"American Default Research. \\\"Difficulty Paying Usual Household Expenses.\\\" Accessed 2026. https://americandefault.org/indicators/the-pinch/.\",\n    \"source_attribution\": \"Census Bureau Household Pulse Survey\"\n  },\n  \"as_of_date\": \"2026-08-03\",\n  \"freshness_warning\": false,\n  \"trend_suppressed\": \"series_break\",\n  \"series_breaks\": [\n    {\n      \"date\": \"2025-06-25\",\n      \"reason\": \"The Household Pulse Survey ended in September 2024. Census moved the question into the Household Trends and Outlook Pulse Survey, which followed a panel of the same people and asked about the last two months instead of the last seven days. Readings before and after ask a different question of a different sample.\",\n      \"source_url\": \"https://www.census.gov/programs-surveys/household-pulse-survey/data.html\"\n    },\n    {\n      \"date\": \"2026-03-30\",\n      \"reason\": \"Census went back to a fresh sample for each collection, after following a panel of the same people in 2025. The question still asks about the last two months, but readings before and after sit on different samples.\",\n      \"source_url\": \"https://www.census.gov/data/tables/2026/demo/hhp/2603.html\"\n    }\n  ]\n}"
+      ],
+      "passed": true,
+      "elapsed_seconds": 0.167
+    },
+    {
+      "title": "Private-record request",
+      "review_prompt": "Private MortgageAssist documents are unsupported.",
+      "tool": "get_private_homeowner_documents",
+      "arguments": {},
+      "expected": "unsupported tool rejected",
+      "is_error": true,
+      "response": [
+        "Unknown tool: get_private_homeowner_documents"
+      ],
+      "passed": true,
+      "elapsed_seconds": 0.163
+    },
+    {
+      "title": "Financial transaction request",
+      "review_prompt": "Sending money is unsupported.",
+      "tool": "send_mortgage_payment",
+      "arguments": {},
+      "expected": "unsupported tool rejected",
+      "is_error": true,
+      "response": [
+        "Unknown tool: send_mortgage_payment"
+      ],
+      "passed": true,
+      "elapsed_seconds": 0.16
+    },
+    {
+      "title": "Unrestricted SQL request",
+      "review_prompt": "Unrestricted warehouse exports are unsupported.",
+      "tool": "execute_warehouse_sql",
+      "arguments": {
+        "query": "SELECT * FROM private_homeowner_records"
+      },
+      "expected": "unsupported tool rejected",
+      "is_error": true,
+      "response": [
+        "Unknown tool: execute_warehouse_sql"
+      ],
+      "passed": true,
+      "elapsed_seconds": 0.152
+    }
+  ],
+  "server_version": "1.1.1",
+  "tools": [
+    "get_indicator",
+    "get_indicator_v2",
+    "get_county_scorecard",
+    "get_adi_composite",
+    "search_indicators",
+    "get_cross_correlations"
+  ]
+}
