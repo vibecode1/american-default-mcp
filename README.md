@@ -21,6 +21,28 @@ this README does not claim that either platform has approved the listing.
 Anonymous access allows 10 calls per minute and 60 per hour per IP block.
 Higher-volume users can request an issued key through the public documentation.
 The static JSON endpoints are the suitable route for permitted bulk downloads.
+HTTP clients reading the website or its JSON endpoints should send a descriptive
+User-Agent identifying their application. Cloudflare Pages may reject a library's
+default identity with error 1010; a descriptive application name works without
+impersonating a browser. The hosted MCP transport is a separate endpoint.
+
+
+## Domain discovery
+
+The main domain advertises the connector at
+`https://americandefault.org/.well-known/ai-catalog.json`. Its entry points to
+`https://mcp.americandefault.org/mcp/server-card`, using the experimental
+[MCP Server Card format](https://github.com/modelcontextprotocol/ext-server-card).
+This format describes identity and connection details; tools remain discoverable
+through the MCP protocol.
+
+For clients using Cloudflare's earlier discovery convention, both domains serve
+`/.well-known/mcp/server-card.json`. That compatibility card includes the exact
+tool descriptions and input schemas returned by the running SDK. The main-domain
+route proxies only this public metadata from the MCP host, without forwarding
+cookies or authorization. Cards support CORS, HEAD and conditional ETag requests.
+The registry metadata supplies the same name and version used at initialization.
+Discovery metadata does not grant access or guarantee agent recommendations.
 
 ## Research examples
 

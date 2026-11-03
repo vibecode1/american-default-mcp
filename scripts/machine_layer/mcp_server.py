@@ -69,8 +69,10 @@ from scripts.machine_layer.tools import (  # noqa: E402
     search_indicators,
 )
 
-SERVER_NAME = "american-default-mcp"
-SERVER_VERSION = "1.1.1"
+from scripts.machine_layer.discovery import REGISTRY  # noqa: E402
+
+SERVER_NAME = REGISTRY["name"]
+SERVER_VERSION = REGISTRY["version"]
 SCHEMA_VERSION = "v1"
 SUPPORTED_SCHEMA_VERSIONS = ("v1", "v2")
 _index_products = load_index_products()["products"]
@@ -113,9 +115,9 @@ def _build_transport_security() -> TransportSecuritySettings:
 # at the two call sites that serve HTTP. stdio never had a Host header to check.
 mcp = MCPServer(
     name=SERVER_NAME,
-    title="American Default Research",
+    title=REGISTRY["title"],
     version=SERVER_VERSION,
-    website_url="https://americandefault.org/press/mcp/",
+    website_url=REGISTRY["websiteUrl"],
     instructions=(
         "Research U.S. household financial distress using public indicators, "
         "county scorecards, and the American Distress Index. Search indicators "

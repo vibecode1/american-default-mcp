@@ -2,12 +2,13 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "org.americandefault/research",
   "title": "American Default Research",
-  "description": "Read-only U.S. household-finance research: economic indicators, county scores, ADI and citations.",
+  "description": "Read-only MCP for U.S. household distress: 121 indicators; ADI has 10 members across 5 domains; CDI covers 3,144 counties.",
   "version": "1.1.1",
   "websiteUrl": "https://americandefault.org/press/mcp/",
   "repository": {
     "url": "https://github.com/vibecode1/american-default-mcp",
-    "source": "github"
+    "source": "github",
+    "subfolder": "scripts/machine_layer"
   },
   "remotes": [
     {

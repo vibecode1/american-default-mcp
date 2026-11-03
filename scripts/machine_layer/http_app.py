@@ -42,6 +42,7 @@ from starlette.responses import JSONResponse, RedirectResponse, Response
 from starlette.routing import Route
 
 from scripts.machine_layer.auth import _normalize_provided_key, get_expected_key
+from scripts.machine_layer.discovery import CARD_PATH, CATALOG_PATH, COMPAT_CARD_PATH, discovery_response
 from scripts.machine_layer.rate_limit import TokenBucket, _read_env_int
 
 logger = logging.getLogger(__name__)
@@ -135,6 +136,8 @@ def reset_ip_buckets() -> None:
 
 
 def _is_mcp_request(path: str) -> bool:
+    if path == CARD_PATH:
+        return False  # Public metadata, never an authenticated MCP operation.
     return path == MCP_PATH_PREFIX or path.startswith(MCP_PATH_PREFIX + "/")
 
 
@@ -435,7 +438,10 @@ def build_app(mcp_app=None) -> Starlette:
             transport_security=_build_transport_security()
         )
 
-    routes: list = list(mcp_app.routes)
+    routes: list = [
+        Route(path, endpoint=discovery_response, methods=["GET", "HEAD", "OPTIONS"])
+        for path in (CARD_PATH, COMPAT_CARD_PATH, CATALOG_PATH)
+    ] + list(mcp_app.routes)
     routes.append(Route(HEALTH_PATH, endpoint=_healthz, methods=["GET"]))
     routes.append(Route(CONTACT_PATH, endpoint=_contact_post, methods=["POST"]))
 
