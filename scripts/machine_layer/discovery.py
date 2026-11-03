@@ -32,12 +32,24 @@ def server_card() -> dict:
 def catalog() -> dict:
     return {"specVersion": "1.0", "host": {"displayName": REGISTRY["title"]}, "entries": [{
         "identifier": "urn:air:americandefault.org:mcp:research",
+        "displayName": REGISTRY["title"],
         "type": "application/mcp-server-card+json",
         "url": REGISTRY["remotes"][0]["url"] + "/server-card",
+        "representativeQueries": [
+            "What is the latest U.S. personal saving rate and what month does it cover?",
+            "How has the American Distress Index changed since 2020?",
+            "What is the latest County Distress Index score for King County, Washington?",
+        ],
     }, {
         "identifier": "urn:air:americandefault.org:skill:cite-american-default",
+        "displayName": "Cite American Default Research",
         "type": "application/agent-skills+md",
         "url": "https://americandefault.org/.well-known/agent-skills/cite-american-default/SKILL.md",
+        "representativeQueries": [
+            "Find the original publisher, observation date and source link for a household savings statistic.",
+            "How do I cite an American Distress Index release in an article?",
+            "Find a public household distress chart and check its reuse terms.",
+        ],
     }]}
 
 
