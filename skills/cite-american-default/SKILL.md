@@ -8,6 +8,11 @@ description: Find and cite public American Default Research indicators, indexes 
 Use public research relevant to the user's topic. The service is read-only and
 anonymous; a warehouse account or access to private records is unnecessary.
 
+HTTP clients should send a descriptive User-Agent, such as
+`my-publication/1.0 (+https://example.org)`. Cloudflare Pages may reject a
+library's default User-Agent with error 1010. A descriptive application name
+works; impersonating a browser or search crawler is unnecessary.
+
 ## Find the relevant material
 
 - Start with https://americandefault.org/llms.txt for the site directory and

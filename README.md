@@ -21,6 +21,10 @@ this README does not claim that either platform has approved the listing.
 Anonymous access allows 10 calls per minute and 60 per hour per IP block.
 Higher-volume users can request an issued key through the public documentation.
 The static JSON endpoints are the suitable route for permitted bulk downloads.
+HTTP clients reading the website or its JSON endpoints should send a descriptive
+User-Agent identifying their application. Cloudflare Pages may reject a library's
+default identity with error 1010; a descriptive application name works without
+impersonating a browser. The hosted MCP transport is a separate endpoint.
 
 ## Domain discovery
 
